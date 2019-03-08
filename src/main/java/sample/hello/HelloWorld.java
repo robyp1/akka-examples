@@ -6,6 +6,9 @@ import akka.event.LoggingAdapter;
 import akka.japi.pf.DeciderBuilder;
 
 import java.time.Duration;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
+import java.util.concurrent.ExecutionException;
 
 import static akka.pattern.Patterns.ask;
 import static sample.hello.Greeter.Msg;
@@ -43,18 +46,20 @@ public class HelloWorld extends AbstractActor {
         }
 
   @Override
-  public void preStart() {
+  public void preStart() throws ExecutionException, InterruptedException {
     log.debug("enter preStart for {}", MyUtilFunctions.actorInfo.apply(Msg.DONE, this));
     // create the greeter actor
     final ActorRef greeter = getContext().actorOf(Props.create(Greeter.class), "greeter");
     // tell it to perform the greeting
-    greeter.tell(Msg.GREET, self()); //-> fire and forget (async),
+    greeter.tell(Msg.GREET, self()); //-> fire and forget (asyncronous)
     log.info("****");
       //asincrono con timeout:
-    //Pattern.ask() ->z fire and get Future replay (async)
-    final Duration t = Duration.ofSeconds(5);
-    ask(greeter, Msg.GREET_RESP, t);
-    log.info("****");
+    //Pattern.ask() -> fire and get a Future reply (async)
+    final Duration t = Duration.ofSeconds(10);
+      CompletionStage<Object> asyncResultResponse = ask(greeter, Msg.GREET_RESP, t);
+      CompletableFuture<Object> result = asyncResultResponse.toCompletableFuture();
+      TaskResult r = (TaskResult) result.get();
+      log.info("**** greete r service response is " + r);
     // GREET_RESP
   }
 
