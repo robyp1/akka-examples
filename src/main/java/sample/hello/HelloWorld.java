@@ -7,6 +7,7 @@ import akka.japi.pf.DeciderBuilder;
 
 import java.time.Duration;
 
+import static akka.pattern.Patterns.ask;
 import static sample.hello.Greeter.Msg;
 
 public class HelloWorld extends AbstractActor {
@@ -34,6 +35,10 @@ public class HelloWorld extends AbstractActor {
             .matchEquals(Msg.WAIT, m ->{
               log.info("Received {},  actor wait for msg done " , Msg.WAIT.name());
             })
+            .match(TaskResult.class, r -> {
+                log.info("Received {}, stop actor " , r);
+                getContext().stop(self());
+            } )
             .build();
         }
 
@@ -43,7 +48,14 @@ public class HelloWorld extends AbstractActor {
     // create the greeter actor
     final ActorRef greeter = getContext().actorOf(Props.create(Greeter.class), "greeter");
     // tell it to perform the greeting
-    greeter.tell(Msg.GREET, self());
+    greeter.tell(Msg.GREET, self()); //-> fire and forget (async),
+    log.info("****");
+      //asincrono con timeout:
+    //Pattern.ask() ->z fire and get Future replay (async)
+    final Duration t = Duration.ofSeconds(5);
+    ask(greeter, Msg.GREET_RESP, t);
+    log.info("****");
+    // GREET_RESP
   }
 
 
