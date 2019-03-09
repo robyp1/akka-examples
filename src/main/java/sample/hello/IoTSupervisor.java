@@ -3,23 +3,12 @@ package sample.hello;
 import akka.actor.*;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
-import akka.japi.pf.DeciderBuilder;
 
-import java.time.Duration;
-import java.util.concurrent.CompletionException;
 
 public class IoTSupervisor extends AbstractActor {
 
     final LoggingAdapter log = Logging.getLogger(getContext().system(), this);
 
-       //strategia di bulkahead per il solo child che fallissce (OneForOneStrategy)
-    private static SupervisorStrategy strategy =
-            new OneForOneStrategy(
-                    10,
-                    Duration.ofMinutes(1),
-                    DeciderBuilder.match(ActorRuntimeException.class, e -> SupervisorStrategy.restart())
-                            .matchAny(o -> SupervisorStrategy.escalate())
-                            .build());
 
     private final Integer param1;
 
@@ -49,9 +38,4 @@ public class IoTSupervisor extends AbstractActor {
     }
 
 
-    @Override
-    public SupervisorStrategy supervisorStrategy() {
-        log.debug("enter in supervisorStrategy {}", strategy.getClass().getSimpleName() );
-        return strategy;
-    }
 }

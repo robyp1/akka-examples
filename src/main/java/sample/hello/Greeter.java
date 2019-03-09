@@ -41,8 +41,9 @@ public class Greeter extends AbstractActor {
                       sender().tell(Msg.DONE, self());
                   } else
                       throw new ActorRuntimeException("casual error");
-              })
-              .get();
+              });
+              //.get(); //non blocco perchè non aspetto risultato
+              log.info("************************************");
           }catch (ActorRuntimeException ex){
               throw new CompletionException(ex.getCause());
           }

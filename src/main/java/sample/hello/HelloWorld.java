@@ -15,7 +15,16 @@ import static sample.hello.Greeter.Msg;
 
 public class HelloWorld extends AbstractActor {
 
-  final LoggingAdapter log = Logging.getLogger(getContext().system(), this);
+    final LoggingAdapter log = Logging.getLogger(getContext().system(), this);
+
+    //strategia di bulkahead per il solo child che fallissce (OneForOneStrategy)
+    private static SupervisorStrategy strategy =
+            new OneForOneStrategy(
+                    10,
+                    Duration.ofMinutes(1),
+                    DeciderBuilder.match(ActorRuntimeException.class, e -> SupervisorStrategy.restart())
+                            .matchAny(o -> SupervisorStrategy.escalate())
+                            .build());
     private final Integer param;
 
     public HelloWorld(Integer param) {
@@ -60,6 +69,12 @@ public class HelloWorld extends AbstractActor {
       log.info("**** greete r service response is " + r);
     // GREET_RESP
   }
+
+    @Override
+    public SupervisorStrategy supervisorStrategy() {
+        log.debug("enter in supervisorStrategy {}", strategy.getClass().getSimpleName() );
+        return strategy;
+    }
 
 
 }
