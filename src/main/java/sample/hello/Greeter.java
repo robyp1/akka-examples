@@ -11,13 +11,18 @@ import java.util.concurrent.CompletionException;
 public class Greeter extends AbstractActor {
 
   final LoggingAdapter log = Logging.getLogger(getContext().system(), this);
+    private final Integer param;
 
 
-  public static enum Msg {
+    public static enum Msg {
     GREET, DONE, WAIT, GREET_RESP ;
   }
 
-  @Override
+    public Greeter(Integer param) {
+      this.param = param;
+    }
+
+    @Override
   public Receive createReceive() {
     log.debug("enter createReceive for {}",  MyUtilFunctions.actorInfo.apply(Msg.GREET, this));
     return receiveBuilder()
@@ -31,8 +36,8 @@ public class Greeter extends AbstractActor {
                       }
               )
               .thenAccept(s -> {//quando finisce il processo esegue questo
-                  if (LocalTime.now().getSecond() % 2 == 0) { //casualità per provare il bulk ahead e restart del processo in failure
-                      log.info("async process complete, sending DONE! ... ");
+                  if (LocalTime.now().getSecond() % param.intValue() == 0) { //casualità per provare il bulk ahead e restart del processo in failure
+                      log.info("param: {} async process complete, sending DONE! ... ",param.intValue());
                       sender().tell(Msg.DONE, self());
                   } else
                       throw new ActorRuntimeException("casual error");

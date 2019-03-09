@@ -16,9 +16,13 @@ import static sample.hello.Greeter.Msg;
 public class HelloWorld extends AbstractActor {
 
   final LoggingAdapter log = Logging.getLogger(getContext().system(), this);
+    private final Integer param;
 
+    public HelloWorld(Integer param) {
+        this.param = param;
+    }
 
-  @Override
+    @Override
   public Receive createReceive() {
     String s =  MyUtilFunctions.actorInfo.apply(Msg.DONE, this);
     log.debug("enter createReceive for {}", s);
@@ -42,13 +46,13 @@ public class HelloWorld extends AbstractActor {
   public void preStart() throws ExecutionException, InterruptedException {
     log.debug("enter preStart for {}", MyUtilFunctions.actorInfo.apply(Msg.DONE, this));
     // create the greeter actor
-    final ActorRef greeter = getContext().actorOf(Props.create(Greeter.class), "greeter");
+    final ActorRef greeter = getContext().actorOf(Props.create(Greeter.class, param), "greeter");
     // tell it to perform the greeting
     log.info("**send Greet message to greeter**");
     greeter.tell(Msg.GREET, self()); //-> fire and forget (asyncronous)
       //asincrono con timeout:
     //Pattern.ask() -> fire and get a Future reply (async)
-    final Duration t = Duration.ofSeconds(20);
+      final Duration t = Duration.ofSeconds(20);
       log.info("**** send {} to greter with ask  ",Msg.GREET_RESP.name());
       CompletionStage<Object> asyncResultResponse = ask(greeter, Msg.GREET_RESP, t);
       CompletableFuture<Object> result = asyncResultResponse.toCompletableFuture();

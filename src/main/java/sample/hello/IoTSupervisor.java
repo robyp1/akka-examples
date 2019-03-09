@@ -12,20 +12,25 @@ public class IoTSupervisor extends AbstractActor {
 
     final LoggingAdapter log = Logging.getLogger(getContext().system(), this);
 
-    final ActorRef helloWorld = getContext().actorOf(Props.create(HelloWorld.class), "hello-World");
-
-
-    //strategia di bulkahead per il solo child che fallissce (OneForOneStrategy)
+       //strategia di bulkahead per il solo child che fallissce (OneForOneStrategy)
     private static SupervisorStrategy strategy =
             new OneForOneStrategy(
                     10,
                     Duration.ofMinutes(1),
-                    DeciderBuilder.match(CompletionException.class, e -> SupervisorStrategy.restart())
+                    DeciderBuilder.match(ActorRuntimeException.class, e -> SupervisorStrategy.restart())
                             .matchAny(o -> SupervisorStrategy.escalate())
                             .build());
 
+    private final Integer param1;
+
+    public IoTSupervisor(Integer param) {
+        this.param1= param;
+        System.out.println("start with param " + param);
+        ActorRef helloWorld = getContext().actorOf(Props.create(HelloWorld.class,  param), "hello-World");
+    }
+
     public static Props getProprops(){
-        return  Props.create(IoTSupervisor.class);
+        return  Props.create(IoTSupervisor.class, new Integer(2));//il secondo argomento viene passato al costruttore
     }
 
     @Override
