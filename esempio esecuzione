@@ -1,0 +1,22 @@
+
+[INFO] [03/11/2019 14:24:03.237] [iot-system-akka.actor.default-dispatcher-3] [akka://iot-system/user/iot-supervisor] IoT Application started
+
+[INFO] [03/11/2019 14:24:03.258] [iot-system-akka.actor.default-dispatcher-2] [akka://iot-system/user/iot-supervisor/hello-World] **** send GREET_RESP to greter with ask
+[DEBUG] [03/11/2019 14:24:03.268] [iot-system-akka.actor.default-dispatcher-2] [akka://iot-system/user/iot-supervisor/hello-World] enter createReceive for typeOf Message selector : sample.hello.Greeter$Msg.DONE akka://iot-system/user/iot-supervisor/hello-World - parent path: user/iot-supervisor/hello-World
+[DEBUG] [03/11/2019 14:24:03.271] [iot-system-akka.actor.default-dispatcher-2] [akka://iot-system/user/iot-supervisor/hello-World] enter preStart for typeOf Message selector : sample.hello.Greeter$Msg.DONE akka://iot-system/user/iot-supervisor/hello-World - parent path: user/iot-supervisor/hello-World
+[INFO] [03/11/2019 14:24:03.271] [iot-system-akka.actor.default-dispatcher-2] [akka://iot-system/user/iot-supervisor/hello-World] **send Greet message to greeter**
+[INFO] [03/11/2019 14:24:13.280] [iot-system-akka.actor.default-dispatcher-2] [akka://iot-system/user/iot-supervisor/hello-World] Received **WAIT,  remote long process running, i'm  waiting for msg done
+[INFO] [03/11/2019 14:24:13.281] [iot-system-akka.actor.default-dispatcher-2] [akka://iot-system/user/iot-supervisor/hello-World] **** greeter service response is TaskResult{result=true}
+
+[DEBUG] [03/11/2019 14:24:03.259] [iot-system-akka.actor.default-dispatcher-10] [akka://iot-system/user/iot-supervisor/hello-World/greeter] enter createReceive for typeOf Message selector : sample.hello.Greeter$Msg.GREET akka://iot-system/user/iot-supervisor/hello-World/greeter - parent path: user/iot-supervisor/hello-World/greeter
+[INFO] [03/11/2019 14:24:03.263] [iot-system-akka.actor.default-dispatcher-10] [akka://iot-system/user/iot-supervisor/hello-World/greeter] Waiting 2...
+[INFO] [03/11/2019 14:24:03.264		] [iot-system-akka.actor.default-dispatcher-10] [akka://iot-system/user/iot-supervisor/hello-World/greeter] Run async ...
+[INFO] [03/11/2019 14:24:13.268] [iot-system-akka.actor.default-dispatcher-10] [akka://iot-system/user/iot-supervisor/hello-World/greeter] async process complete, sending result TaskResult{result=true}
+[INFO] [03/11/2019 14:24:23.281] [iot-system-akka.actor.default-dispatcher-10] [akka://iot-system/user/iot-supervisor/hello-World/greeter] *************************
+
+[INFO] [03/11/2019 14:24:13.279] [iot-system-akka.actor.default-dispatcher-3] [akka://iot-system/user/iot-supervisor/hello-World/greeter] Waiting 1...
+[INFO] [03/11/2019 14:24:13.279] [iot-system-akka.actor.default-dispatcher-3] [akka://iot-system/user/iot-supervisor/hello-World/greeter] Run async ...
+[INFO] [03/11/2019 14:24:23.281] [iot-system-akka.actor.default-dispatcher-3] [akka://iot-system/user/iot-supervisor/hello-World/greeter] param: 2 async process complete
+[INFO] [03/11/2019 14:24:23.281] [iot-system-akka.actor.default-dispatcher-3] [akka://iot-system/user/iot-supervisor/hello-World/greeter] Sending DONE
+
+[INFO] [03/11/2019 14:24:23.281] [iot-system-akka.actor.default-dispatcher-4] [akka://iot-system/user/iot-supervisor/hello-World] Received ***DONE
