@@ -4,6 +4,7 @@ import akka.actor.*;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import akka.japi.pf.DeciderBuilder;
+import javafx.concurrent.Task;
 
 import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
@@ -30,6 +31,7 @@ public class HelloWorld extends AbstractActor {
                             .build());
     private final Integer param;
 
+
     public HelloWorld(Integer param) {
         this.param = param;
         // create the greeter actor as child of this actor
@@ -40,20 +42,26 @@ public class HelloWorld extends AbstractActor {
     @Override
   public Receive createReceive() {
     String s =  MyUtilFunctions.actorInfo.apply(Msg.DONE, this);
+    Duration d = Duration.ofSeconds(20);
+    log.info("**** send {} to greter with ask  ", Msg.GREET_RESP.name());
+    //Pattern.ask() -> fire and get a Future reply (async)
+    final CompletionStage<Object> asyncResultResponse = ask(_greeter, Msg.GREET_RESP, d);
     log.debug("enter createReceive for {}", s);
     return receiveBuilder()
             .matchEquals(Msg.DONE, m -> {
               // when the greeter is done, stop this actor and with it the application
-              log.info("Received {} " , Msg.DONE.name());
+              log.info("Received ***{} " , Msg.DONE.name());
               getContext().stop(_greeter);//stop sul child
             })
             .matchEquals(Msg.WAIT, m ->{
-              log.info("Received {},  remote long process running, i'm  waiting for msg done " , Msg.WAIT.name());
+              log.info("Received **{},  remote long process running, i'm  waiting for msg done " , Msg.WAIT.name());
+                Object resp = asyncResultResponse.toCompletableFuture().get();
+                while (! (resp instanceof TaskResult)) {
+                    resp = asyncResultResponse.toCompletableFuture().get();
+                    log.info("get: " + resp);
+                }
+                log.info("**** greeter service response is " + resp);
             })
-            .match(TaskResult.class, r -> {
-                log.info("Received {} " , r);
-                //getContext().stop(self());
-            } )
             .match(Terminated.class, t -> {log.info("Terminato greeter {}", t.actor());})
             .build();
         }
@@ -64,14 +72,6 @@ public class HelloWorld extends AbstractActor {
     // tell it to perform the greeting
     log.info("**send Greet message to greeter**");
     _greeter.tell(Msg.GREET, self()); //-> fire and forget
-      //asincrono con timeout:
-    //Pattern.ask() -> fire and get a Future reply (async)
-      final Duration t = Duration.ofSeconds(20);
-      log.info("**** send {} to greter with ask  ",Msg.GREET_RESP.name());
-      CompletionStage<Object> asyncResultResponse = ask(_greeter, Msg.GREET_RESP, t);
-      CompletableFuture<Object> result = asyncResultResponse.toCompletableFuture();
-      TaskResult r = (TaskResult) result.get();
-      log.info("**** greete r service response is " + r);
   }
 
     @Override

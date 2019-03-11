@@ -41,19 +41,20 @@ public class Greeter extends AbstractActor {
                         sender().tell(Msg.WAIT, self()); //mando il messaggio di attesa, che sto elaborando
                         Boolean result = longRunningTask();
                         log.info("param: {} async process complete ", param.intValue());
+                        log.info("Sending DONE");
+                        sender().tell(Msg.DONE, self());
                         return Msg.DONE;
-                    }, ec);
-            //attendo ma sono in un dispatcher diverso e quindi non blocco il sucessivo matchEquals
-            Msg result = future.result(Duration.apply(6000L, TimeUnit.SECONDS), AwaitPermission$.MODULE$);
-            log.info("Sending DONE");
-            sender().tell(Msg.DONE, self());
+                    }, param == 2 ? getContext().getDispatcher() : ec);//switch from default dispatcher to specialized one..
+            Msg result = future.result(Duration.apply(5000L, TimeUnit.SECONDS), AwaitPermission$.MODULE$);
+//            log.info("Sending DONE");
+            //sender().tell(Msg.DONE, self());
             log.info("*************************");
         })
         .matchEquals(Msg.GREET_RESP, (m) -> { //chiamato con metodo ask, viene eseguito in asincrono (ask lo wrappa in CompletableFuture o Future?)
             log.info("Waiting 2... ");
 //        non mando WAIT come l'altro perchè l'ask restituisce il primo tell fatto quindi wait lo evito(siccome result andrebbe come secondo tell, e non andrebbe a buon fine)
             TaskResult result = new TaskResult(longRunningTask());
-            log.info("async process complete, sending result {} ", result.getResult());
+            log.info("async process complete, sending result {} ", result);
             sender().tell(result, getSelf());//questo l'unico tell che è la risposta all'esecuzione asincrona
 
         })
@@ -63,7 +64,7 @@ public class Greeter extends AbstractActor {
     private Boolean longRunningTask() {
         log.info("Run async ... ");
         try {
-            Thread.currentThread().sleep(3000);
+            Thread.currentThread().sleep(10000);
         } catch (InterruptedException e) {
             e.printStackTrace();
             return Boolean.FALSE;

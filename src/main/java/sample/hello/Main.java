@@ -13,7 +13,7 @@ public class Main {
     ActorSystem iotSystem = ActorSystem.create("iot-system");
     try {
       iotSystem.actorOf(IoTSupervisor.getProprops(), "iot-supervisor");
-
+      //System.out.println(System.getProperty("java.io.tmpdir"));
       System.out.println("Press ENTER to exit the system");
       System.in.read();
     } finally
