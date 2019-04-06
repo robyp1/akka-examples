@@ -2,6 +2,7 @@ package sample.hello;
 
 import akka.actor.AbstractActor;
 import akka.dispatch.Futures;
+import akka.dispatch.OnComplete;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 
@@ -41,11 +42,23 @@ public class Greeter extends AbstractActor {
                         sender().tell(Msg.WAIT, self()); //mando il messaggio di attesa, che sto elaborando
                         Boolean result = longRunningTask();
                         log.info("param: {} async process complete ", param.intValue());
-                        log.info("Sending DONE");
-                        sender().tell(Msg.DONE, self());
                         return Msg.DONE;
                     }, param == 2 ? getContext().getDispatcher() : ec);//switch from default dispatcher to specialized one..
-            Msg result = future.result(Duration.apply(5000L, TimeUnit.SECONDS), AwaitPermission$.MODULE$);
+//            Msg result = future.result(Duration.apply(5000L, TimeUnit.SECONDS), AwaitPermission$.MODULE$);
+            future.onComplete( new OnComplete<Msg>(){
+                                   @Override
+                                   public void onComplete(Throwable failure, Msg success) throws Throwable {
+                                        if(failure!= null){
+                                            log.error("Error " + failure.getMessage());
+                                        }
+                                        else {
+                                            log.info("Sending  " + success);
+                                            sender().tell(success, self());// sending done
+                                        }
+                                   }
+                               }
+                    , ec);
+
 //            log.info("Sending DONE");
             //sender().tell(Msg.DONE, self());
             log.info("*************************");
